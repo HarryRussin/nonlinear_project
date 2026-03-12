@@ -13,7 +13,7 @@ t = 0 #s
 import numpy as np
 import pandas as pd
 
-def simulate_simple_pendulum(theta0, omega0, g=9.81, L=1.0, dt=0.01, t_max=10.0):
+def simulate_simple_pendulum(theta0, omega0, g=9.81, L=1.0, dt=0.01, t_max=10.0,gamma=0.0):
     # Simulate a simple pendulum (Euler method)
     t = np.arange(0, t_max + dt, dt)
     theta = np.zeros_like(t)
@@ -21,8 +21,12 @@ def simulate_simple_pendulum(theta0, omega0, g=9.81, L=1.0, dt=0.01, t_max=10.0)
     theta[0] = theta0
     omega[0] = omega0
     for i in range(len(t) - 1):
-        omega[i + 1] = omega[i] - (g / L) * np.sin(theta[i]) * dt
+        omega[i + 1] = omega[i] - (g / L) * np.sin(theta[i]) * dt - gamma*omega[i] * dt
         theta[i + 1] = theta[i] + omega[i + 1] * dt
+        if theta[i + 1] > np.pi:
+            theta[i + 1] -= 2 * np.pi
+        elif theta[i + 1] < -np.pi:
+            theta[i + 1] += 2 * np.pi
     return pd.DataFrame({
         'time': t,
         'theta_rad': theta,
@@ -38,33 +42,36 @@ def zero_crossing_times(theta, time):
             crossings.append(t_cross)
     return crossings
 
-for i in range(10):
-    theta0 = np.radians(1 * i)  # Initial angle in radians
-    omega0 = 0.0  # Initial angular velocity
-    df = simulate_simple_pendulum(theta0, omega0)
-    plt.plot(df['theta_rad'], df['omega'], label=f'Initial Angle: {1 * i}°')
-    # crossings = zero_crossing_times(df['theta_rad'], df['time'])
-    # if crossings:
-    #     plt.scatter(crossings, [0]*len(crossings), color='red', s=20)  # Mark zero crossings
 
-plt.xlabel('Angle (radians)')
-plt.ylabel('Angular Velocity (rad/s)')
-plt.title('Phase Space of Simple Pendulum')
-plt.grid()
-plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
-plt.show()
+if __name__ == "__main__":
 
-for i in range(10):
-    theta0 = np.radians(1 * i)  # Initial angle in radians
-    omega0 = 0.0  # Initial angular velocity
-    df = simulate_simple_pendulum(theta0, omega0)
-    plt.plot(df['time'], df['theta_rad'], label=f'Initial Angle: {1 * i}°')
-    crossings = zero_crossing_times(df['theta_rad'], df['time'])
-    if crossings:
-        plt.scatter(crossings, [0]*len(crossings), color='red', s=20)  # Mark zero crossings
-plt.xlabel('Time (s)')
-plt.ylabel('Angle (radians)')
-plt.title('Angle vs Time for Simple Pendulum')
-plt.grid()
-plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
-plt.show()
+    for i in range(10):
+        theta0 = np.radians(15 * i)  # Initial angle in radians
+        omega0 = 0.0  # Initial angular velocity
+        df = simulate_simple_pendulum(theta0, omega0)
+        plt.plot(df['theta_rad'], df['omega'], label=f'Initial Angle: {15 * i}°')
+        # crossings = zero_crossing_times(df['theta_rad'], df['time'])
+        # if crossings:
+        #     plt.scatter(crossings, [0]*len(crossings), color='red', s=20)  # Mark zero crossings
+
+    plt.xlabel('Angle (radians)')
+    plt.ylabel('Angular Velocity (rad/s)')
+    plt.title('Phase Space of Simple Pendulum')
+    plt.grid()
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1))
+    plt.show()
+
+    for i in range(-10,10):
+        theta0 = np.radians(10 * i)  # Initial angle in radians
+        omega0 = 0.0  # Initial angular velocity
+        df = simulate_simple_pendulum(theta0, omega0)
+        plt.plot(df['time'], df['theta_rad'], label=f'Initial Angle: {15 * i}°')
+        crossings = zero_crossing_times(df['theta_rad'], df['time'])
+        if crossings:
+            plt.scatter(crossings, [0]*len(crossings), color='red', s=20)  # Mark zero crossings
+    plt.xlabel('Time (s)')
+    plt.ylabel('Angle (radians)')
+    plt.title('Angle vs Time for Simple Pendulum')
+    plt.grid()
+    plt.legend()
+    plt.show()
