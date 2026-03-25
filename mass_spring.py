@@ -1,6 +1,7 @@
 from rk4 import RK4
 import numpy as np
 import matplotlib.pyplot as plt
+import plot_style  # noqa: F401 — sets rcParams
 
 dt = 0.1 #s
 t = 0 #s
@@ -64,28 +65,30 @@ for i in range(steps):
 #for importing and good code practice 😎
 if __name__ == "__main__":
     error = np.abs(positions - a_positions)
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 15))
-    plt.subplots_adjust(hspace=0.5)
-    ax1.plot(times, velocities, label='Velocity')
-    ax1.errorbar(times,positions, yerr=error, alpha=0.8, label='Position with error bars')
-    ax1.set_title('Mass-Spring System')
-    ax1.set_xlabel('Time (s)')
-    ax1.set_ylabel('Velocity (m/s) and Position (m)')
-    ax1.grid()
-    ax1.legend()
-    ax2.set_ylim(0.9, 1.1)
-    ax2.plot(times, energies, label='E(t)/E0')
-    ax2.set_title('Energy of Mass-Spring System')
-    ax2.set_xlabel('Time (s)')
-    ax2.set_ylabel('Energy (J)')
-    ax2.grid()
-    ax2.legend()
-    ax3.plot(times, energies, label='zoomed energy')
-    ax3.set_xlabel('Time (s)')
-    ax3.set_ylabel('Energy (J)')
-    ax3.grid()
-    ax3.legend()
-    plt.grid()
+
+    fig, axes = plt.subplots(3, 1, figsize=(3.4, 7.0), sharex=True)
+
+    # Panel (a): position — RK4 vs analytic
+    axes[0].plot(times, a_positions, '--', color='0.55',
+                 label=r'$x(t)$ analytic', linewidth=0.9)
+    axes[0].plot(times, positions, 'k-',
+                 label=r'$x(t)$ RK4', linewidth=0.9)
+    axes[0].fill_between(times, positions - error, positions + error,
+                         color='0.4', alpha=0.25, linewidth=0)
+    axes[0].set_ylabel(r'$x$ (m)')
+    axes[0].legend()
+
+    # Panel (b): velocity
+    axes[1].plot(times, velocities, 'k-', linewidth=0.9)
+    axes[1].set_ylabel(r'$\dot x$ (m s$^{-1}$)')
+
+    # Panel (c): energy conservation ratio
+    axes[2].plot(times, energies, 'k-', linewidth=0.9)
+    axes[2].axhline(1.0, color='0.6', linewidth=0.7, linestyle='--')
+    axes[2].set_ylabel(r'$E(t)/E_0$')
+    axes[2].set_xlabel(r'$t$ (s)')
+
+    plt.tight_layout(pad=0.6)
     plt.show()
 
 #FUNCTION EVERYTHING IN A FUNCTION YIP

@@ -1,8 +1,7 @@
 import numpy as np
 # Runge-Kutta 4th order method for solving ODEs
 
-def RK4(x,y,f,h):
-    
+def RK4(x,y,f,h):    
     k1 = f(x,y)
     k2 = f(x+h/2,y+h*k1/2)
     k3 = f(x+h/2,y+h*k2/2)
